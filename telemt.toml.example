@@ -30,6 +30,8 @@ ignore_time_skew = false
 
 [access.users]
 docker = "ПОДСТАВЬТЕ_32_СИМВОЛА_HEX"
+# Можно добавить несколько пользователей (каждый секрет = отдельный доступ):
+# friend = "ЕЩЕ_32_СИМВОЛА_HEX"
 
 [[upstreams]]
 type = "direct"

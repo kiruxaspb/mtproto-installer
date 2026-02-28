@@ -30,6 +30,23 @@ curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/instal
 3. Запуск: `docker compose up -d`.
 4. Ссылка: `tg://proxy?server=ВАШ_IP&port=443&secret=ВАШ_СЕКРЕТ`.
 
+## Несколько прокси на одном сервере
+
+Если хотите запустить ещё один прокси позже (например, для друга), есть два варианта:
+
+- **Ещё один доступ в том же прокси** — просто добавьте пользователя:
+  ```bash
+  cd /path/to/mtproxy-data
+  ./add-user.sh friend
+  ```
+- **Полностью отдельный прокси (другая конфигурация/порт)** — установите ещё одну копию в другом каталоге и на другом порту:
+  ```bash
+  INSTALL_DIR=/opt/mtproxy-friend LISTEN_PORT=1443 \
+    curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/install.sh | bash
+  ```
+
+Контейнеры будут иметь уникальные имена за счёт разных каталогов установки.
+
 ## Устранение проблем
 
 ### Не подключается к прокси в Telegram
@@ -109,6 +126,25 @@ curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/uninst
 - Остановка: `docker compose down`
 - Перезапуск после смены конфига: `docker compose up -d --force-recreate`
 - **После рестарта сервера** контейнеры поднимутся сами (политика `restart: unless-stopped`). Нужно, чтобы при загрузке запускался Docker: `sudo systemctl enable docker`.
+
+## Добавление нового доступа (ещё один прокси)
+
+Каждый секрет в `telemt.toml` — это отдельный прокси-доступ. Можно добавить нового пользователя и получить новую ссылку.
+
+Если установка была через `install.sh`, в каталоге установки уже есть `add-user.sh`:
+
+```bash
+cd /path/to/mtproxy-data
+./add-user.sh friend
+```
+
+Если вы работаете из репозитория, можно указать каталог установки первым аргументом:
+
+```bash
+./add-user.sh /path/to/mtproxy-data friend
+```
+
+Скрипт сам сгенерирует секрет, добавит его в `telemt.toml`, перезапустит Telemt и выведет ссылку `tg://proxy?...` для друга.
 
 ## Безопасность
 

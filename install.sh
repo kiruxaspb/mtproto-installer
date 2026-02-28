@@ -155,6 +155,8 @@ download_and_configure() {
 	sed "s/443:443/${LISTEN_PORT}:443/" "${INSTALL_DIR}/docker-compose.yml" > "${INSTALL_DIR}/docker-compose.yml.tmp" && mv "${INSTALL_DIR}/docker-compose.yml.tmp" "${INSTALL_DIR}/docker-compose.yml"
 	fetch "${REPO_RAW}/traefik/dynamic/tcp.yml" "${INSTALL_DIR}/traefik/dynamic/tcp.yml"
 	fetch "${REPO_RAW}/telemt.toml.example" "${INSTALL_DIR}/telemt.toml.example"
+	fetch "${REPO_RAW}/add-user.sh" "${INSTALL_DIR}/add-user.sh"
+	chmod +x "${INSTALL_DIR}/add-user.sh"
 
 	SECRET=$(generate_secret)
 
@@ -171,6 +173,7 @@ download_and_configure() {
 	info "Настроен Traefik: SNI ${FAKE_DOMAIN} -> telemt:${TELEMT_INTERNAL_PORT} (TLS passthrough)"
 
 	printf '%s' "$SECRET" > "${INSTALL_DIR}/.secret"
+	printf '%s' "$LISTEN_PORT" > "${INSTALL_DIR}/.listen_port"
 }
 
 run_compose() {
