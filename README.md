@@ -13,17 +13,17 @@
 ## Установка на сервере (всё тянется с GitHub)
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/install.sh | bash
+curl -sSL https://raw.githubusercontent.com/kiruxaspb/mtproto-installer/dev/install.sh | bash
 ```
 
-Скрипт установит Docker (если нужно), скачает `docker-compose.yml`, конфиги Traefik и шаблон Telemt из репозитория [itcaat/mtproto-installer](https://github.com/itcaat/mtproto-installer), сгенерирует секрет, подставит домен маскировки и запустит контейнеры. В конце выведет ссылку вида `tg://proxy?server=...&port=443&secret=...` — добавьте её в Telegram (Настройки → Данные и память → Использовать прокси).
+Скрипт установит Docker (если нужно), скачает `docker-compose.yml`, конфиги Traefik и шаблон Telemt из репозитория [kiruxaspb/mtproto-installer](https://github.com/kiruxaspb/mtproto-installer/tree/dev), сгенерирует секрет, подставит домен маскировки и запустит контейнеры. В конце выведет ссылку вида `tg://proxy?server=...&port=443&secret=...` — добавьте её в Telegram (Настройки → Данные и память → Использовать прокси).
 
 - Домен маскировки по умолчанию: `1c.ru`. Интерактивно можно ввести другой; без TTY: `FAKE_DOMAIN=sberbank.ru curl -sSL ... | bash`.
 - Каталог установки по умолчанию: `./mtproxy-data`. Другой: `INSTALL_DIR=/opt/mtproxy curl -sSL ... | bash`.
 
 ## Локальный запуск (клонирование репозитория)
 
-После `git clone https://github.com/itcaat/mtproto-installer.git && cd mtproto-installer` можно запустить `./install.sh` — скрипт по умолчанию качает файлы с того же GitHub. Либо настроить вручную и поднять без скрипта:
+После `git clone https://github.com/kiruxaspb/mtproto-installer.git -b dev && cd mtproto-installer` можно запустить `./install.sh` — скрипт по умолчанию качает файлы с того же GitHub. Либо настроить вручную и поднять без скрипта:
 
 1. Сгенерируйте секрет: `openssl rand -hex 16`. Скопируйте `telemt.toml.example` в `telemt.toml`, подставьте секрет и при необходимости домен в `censorship.tls_domain`.
 2. В `traefik/dynamic/tcp.yml` домен в `HostSNI(...)` должен совпадать с `censorship.tls_domain` в `telemt.toml`.
@@ -78,7 +78,7 @@ curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/instal
 **Скриптом** (из каталога с репозиторием или скачав скрипт):
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/itcaat/mtproto-installer/main/uninstall.sh | bash
+curl -sSL https://raw.githubusercontent.com/kiruxaspb/mtproto-installer/dev/uninstall.sh | bash
 ```
 
 Каталог по умолчанию — `./mtproxy-data`. Другой каталог или без подтверждения: `./uninstall.sh -y /path/to/mtproxy-data`.
